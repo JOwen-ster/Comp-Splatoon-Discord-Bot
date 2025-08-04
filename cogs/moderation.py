@@ -17,7 +17,7 @@ class Moderation(commands.Cog):
 
     @app_commands.command(name='post', description='Create a embed post!')
     @app_commands.describe(message='Please input your message', channel_id='channel to send the message')
-    async def createPost(self, interaction: discord.Interaction, message: str, channel_id: str):
+    async def create_post(self, interaction: discord.Interaction, message: str, channel_id: str):
         if interaction.user.id not in self.bot.whitelist:
             return
         else:
@@ -33,6 +33,12 @@ class Moderation(commands.Cog):
             except Exception as e:
                 getlog().error(f'{e}')
 
+    @app_commands.command(name='code', description='Link to this bots source code')
+    async def code_cmd(self, interaction: discord.Interaction):
+        await interaction.response.send_message(embed=BotMessageEmbed(
+            title='Bot developed by @typos. on Discord',
+            description='https://github.com/JOwen-ster/Comp-Splatoon-Discord-Bot')
+        )
 
 # Add the cog to your discord bot.
 async def setup(bot):
