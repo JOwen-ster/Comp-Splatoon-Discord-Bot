@@ -1,81 +1,70 @@
 import discord
+from utils.embeds import BotConfirmationEmbed
 
 
 class RoleSelect(discord.ui.Select):
-    def __init__(self, assignable_roles):
-        # Filter roles that can be assigned (not @everyone, not managed, not higher than bot)
-
-        # Create options for the dropdown (max 25 options)
-        options = []
-        for role in assignable_roles[:25]:  # Discord api limit is 25 options per dropdown
-            options.append(discord.SelectOption(
-                label=role.name,
-                value=str(role.id))
-            )
-
+    def __init__(self, region_key, bot=None):
         super().__init__(
             placeholder="Choose a role to assign (removes previous role)...",
-            options=options,
-            max_values=1  # Only allow selecting one role at a time
+            options=[discord.SelectOption(label="Loading...", value="loading")],
+            max_values=1,
+            custom_id=f"role_select_{region_key}"
         )
+        self.region_key = region_key
+        self.bot = bot
+        self.assignable_roles = {}
+        self.all_assignable_roles = []
 
+    def update_roles(self, assignable_roles):
         self.assignable_roles = {str(role.id): role for role in assignable_roles}
-        self.all_assignable_roles = assignable_roles  # Keep reference to all roles in the list
+        self.all_assignable_roles = assignable_roles
+
+        options = []
+        for role in assignable_roles[:25]:
+            options.append(discord.SelectOption(label=role.name, value=str(role.id)))
+        self.options = options or [discord.SelectOption(label="No roles available", value="none")]
 
     async def callback(self, interaction: discord.Interaction):
-        # Get the member who used the dropdown
-        member = interaction.user
+        await interaction.response.defer()
 
-        # Get the selected role (only one since max_values=1)
+        # Load roles if needed (for persistent views after restart)
+        if not self.all_assignable_roles and self.bot:
+            role_cog = self.bot.get_cog('Roles')
+            if role_cog and interaction.guild:
+                filtered_roles = role_cog.filter_xp_roles(key=self.region_key, iterable=interaction.guild.roles)
+                self.update_roles(filtered_roles)
+
+        # Validate selection
+        if not self.all_assignable_roles or self.values[0] in ["none", "loading"]:
+            await interaction.followup.send("❌ No valid roles available.", ephemeral=True)
+            return
+
+        member = interaction.user
         selected_role = self.assignable_roles[self.values[0]]
 
-        added_roles = []
-        removed_roles = []
-        errors = []
+        # Remove existing roles from this category
+        roles_to_remove = [role for role in self.all_assignable_roles if role in member.roles]
 
         try:
-            # First, remove any existing roles from this role list that the user has
-            roles_to_remove = [role for role in self.all_assignable_roles if role in member.roles]
-            
             if roles_to_remove:
-                await member.remove_roles(*roles_to_remove, reason="Exclusive role selection - removing previous roles")
-                removed_roles.extend([role.name for role in roles_to_remove])
+                await member.remove_roles(*roles_to_remove)
 
-            # Then add the new selected role (if it wasn't already the user's role)
             if selected_role not in roles_to_remove:
-                await member.add_roles(selected_role, reason="Exclusive role selection - adding new role")
-                added_roles.append(selected_role.name)
+                await member.add_roles(selected_role)
+                await interaction.followup.send(embed=BotConfirmationEmbed(description=f"✅ **Added role:** {selected_role.name}\n❌**Removed role:** {roles_to_remove[0]}"), ephemeral=True)
             else:
-                # If the user selected the same role they already had, just acknowledge it
-                pass
+                await interaction.followup.send(embed=BotConfirmationEmbed(description=f"You already have the {selected_role.name} role."), ephemeral=True)
 
         except discord.Forbidden:
-            errors.append(f"Missing permissions for role management")
-        except discord.HTTPException as e:
-            errors.append(f"Failed to modify roles: {str(e)}")
-
-        # Create response message
-        response_parts = []
-
-        if added_roles:
-            response_parts.append(f"✅ **Added role:** {', '.join(added_roles)}")
-
-        if removed_roles:
-            response_parts.append(f"❌ **Removed roles:** {', '.join(removed_roles)}")
-
-        if errors:
-            response_parts.append(f"⚠️ **Errors:** {', '.join(errors)}")
-
-        if not response_parts:
-            if selected_role in member.roles:
-                response_parts.append(f"You already have the {selected_role.name} role.")
-            else:
-                response_parts.append("No changes were made.")
-
-        await interaction.response.send_message("\n".join(response_parts), ephemeral=True)
+            await interaction.followup.send("❌ Missing permissions for role management", ephemeral=True)
+        except discord.HTTPException:
+            await interaction.followup.send("❌ Failed to modify roles", ephemeral=True)
 
 
 class RoleView(discord.ui.View):
-    def __init__(self, roles):
+    def __init__(self, region_key, bot=None):
         super().__init__(timeout=None)
-        self.add_item(RoleSelect(assignable_roles=roles))
+        self.add_item(RoleSelect(region_key=region_key, bot=bot))
+    
+    def update_roles(self, roles):
+        self.children[0].update_roles(roles)

@@ -23,8 +23,11 @@ class Bot(commands.Bot):
                 # Load all added cogs into the bot
                 await self.load_extension(f'cogs.{cog}')
                 getlog().info(F'{cog} cog loaded ({i}/{len(extensions)})')
-            except:
-                getlog().info(F'Could not load {cog} cog ({i}/{len(extensions)})')
+            except Exception as e:
+                getlog().error(F'Could not load {cog} cog ({i}/{len(extensions)}): {e}')
+        
+        # Persistent views are automatically set up when cogs with persistent views are loaded
+        # The RoleCog.cog_load() method handles this
         getlog().info('Ran bot setup_hook!')
 
     async def on_ready(self) -> None:
