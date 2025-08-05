@@ -150,7 +150,7 @@ After you have successfully installed the libraries...
 Create a new file named `.env` (no name before the dot) and put the following in it.
 
 ```
-DISCORD_BOT_TOKEN = 'YOUR_BOT_TOKEN_GOES_HERE'
+DISCORD_BOT_TOKEN=YOUR_BOT_TOKEN_GOES_HERE
 ```
 
 Normally you would create a new file named `.gitignore` and put the following inside it.
