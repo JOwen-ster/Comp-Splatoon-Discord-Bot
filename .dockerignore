@@ -1,0 +1,5 @@
+# rename tag to use docker username -> USER/IMAGE_NAME:latest
+
+__pycache__
+.env.example
+TODO.md
