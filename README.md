@@ -165,7 +165,7 @@ I have already done this for you so all you need to do is add more cogs/function
 **REPLACE USERNAME and REPO_NAME with your own username and whatever you want to name the app**
 
 ### DEV
-*run* (remove -d if you dont want to run as you  container as a background process)
+*run* (remove -d if you don't want to run your container as a background process)
 ```
 docker-compose up -d --build
 ```
