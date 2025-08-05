@@ -189,7 +189,7 @@ docker push USERNAME/REPO_NAME:production
 
 *use latest push*
 ```
-docker compose pull
+docker pull
 ```
 
 *run*
