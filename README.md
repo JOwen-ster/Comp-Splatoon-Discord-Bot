@@ -166,18 +166,18 @@ I have already done this for you so all you need to do is add more cogs/function
 
 ### DEV
 ***build***
+* `--no-cache` re-builds your image from scratch instead of using the files docker cached
 ```
 docker compose build --no-cache
 ```
 
-***build and run***
+***run***
 * remove `-d` if you don't want to run your container as a `background process`*
 
 * `-d` means `detached mode` which `will delete the container after stopping it`
 ```
-docker compose up -d --build --no-cache
+docker compose up -d
 ```
-This re-builds your image instead of using the existing to ensure most recent changes are used
 
 ***stop***
 ```
@@ -197,7 +197,7 @@ docker push USERNAME/REPO_NAME:production
 
 ***use latest push***
 ```
-docker pull
+docker compose pull
 ```
 
 ***run***
@@ -207,6 +207,6 @@ docker compose up -d
 
 ***stop***
 ```
-docker compose up -d
+docker compose down
 ```
 Deploy your app using the dockerimage: `USERNAME/REPO_NAME:production`
