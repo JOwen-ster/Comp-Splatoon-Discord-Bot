@@ -124,7 +124,7 @@ First, activate a virtual ENV by running this command once you have changed dire
 python -m venv botenv
 ```
 
-Then (only for Windows Powershell Users)
+Then `running with administrator` (only for Windows Powershell Users)
 ```
 Set-ExecutionPolicy RemoteSigned
 ```
