@@ -175,7 +175,7 @@ docker compose build --no-cache
 ***run***
 * remove `-d` if you don't want to run your container as a `background process`*
 
-* `-d` means `detached mode` which `will delete the container after stopping it`
+* `-d` means `detached mode`
 ```
 docker compose up -d
 ```
