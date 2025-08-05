@@ -162,8 +162,10 @@ I have already done this for you so all you need to do is add more cogs/function
 
 ## Running With Docker 🐋
 
-**REPLACE `USERNAME` and `REPO_NAME` with your own username and whatever you want to name the app**
-**IN `docker-compose.yml` CHANGE WHATEVER the `image` attribute has to use your username and name of your app**
+> [!IMPORTANT]
+> **REPLACE `USERNAME` and `REPO_NAME` with your own username and whatever you want to name the app**
+> 
+> **IN `docker-compose.yml` CHANGE WHATEVER the `image` attribute has to use your username and name of your app**
 
 ### DEV
 ***build***
