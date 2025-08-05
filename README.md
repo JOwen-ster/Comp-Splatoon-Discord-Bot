@@ -162,16 +162,20 @@ I have already done this for you so all you need to do is add more cogs/function
 
 ## RUNNING WITH DOCKER
 
-**REPLACE USERNAME and REPO_NAME with your own username and whatever you want to name the app**
+**REPLACE `USERNAME` and `REPO_NAME` with your own username and whatever you want to name the app**
 
 ### DEV
-***run*** 
+***build***
+```
+docker compose build --no-cache
+```
 
+***build and run***
 * remove `-d` if you don't want to run your container as a `background process`*
 
 * `-d` means `detached mode` which `will delete the container after stopping it`
 ```
-docker compose up -d --build
+docker compose up -d --build --no-cache
 ```
 This re-builds your image instead of using the existing to ensure most recent changes are used
 
@@ -183,7 +187,7 @@ docker compose down
 ### PRODUCTION
 ***build***
 ```
-docker build -t USERNAME/REPO_NAME:production .
+docker compose build --no-cache
 ```
 
 ***push to dockerhub*** (run `docker login` first)
