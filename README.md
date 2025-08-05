@@ -159,3 +159,18 @@ Normally you would create a new file named `.gitignore` and put the following in
 ```
 
 I have already done this for you so all you need to do is add more cogs/functionality and then run [run_bot.py](/run_bot.py)!
+
+## RUNNING WITH DOCKER
+
+**DEV**
+```
+docker-compose up --build
+```
+This uses the `build: .` command
+
+**PRODUCTION**
+```
+docker build -t owenster/comp_splatoon_bot:production .
+docker push owenster/comp_splatoon_bot:production
+```
+Deploy using image: `owenster/comp_splatoon_bot:production`

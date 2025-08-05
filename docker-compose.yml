@@ -1,6 +1,7 @@
-version: "3.8"
+version: '3.8'
 services:
-  bot:
+  splatoon_comp_bot:
     build: .
+    image: owenster/comp_splatoon_bot:production
     env_file: .env
     restart: unless-stopped
