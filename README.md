@@ -183,7 +183,7 @@ docker compose down
 ### PRODUCTION
 ***build***
 ```
-docker compose build -t USERNAME/REPO_NAME:production .
+docker build -t USERNAME/REPO_NAME:production .
 ```
 
 ***push to dockerhub*** (run `docker login` first)
