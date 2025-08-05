@@ -166,9 +166,6 @@ I have already done this for you so all you need to do is add more cogs/function
 
 ### DEV
 ```
-docker build -t USERNAME/REPO_NAME:production .
-```
-```
 docker-compose up --build
 ```
 
