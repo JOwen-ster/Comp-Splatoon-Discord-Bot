@@ -184,7 +184,7 @@ docker build -t USERNAME/REPO_NAME:production .
 
 *push to dockerhub* (run `docker login` first)
 ```
-docker push USERNAME/comp_splatoon_bot:production
+docker push USERNAME/REPO_NAME:production
 ```
 
 *use latest push*
