@@ -5,7 +5,7 @@ A repo containing a standard file structure template for a Discord bot!
 
 [**TODO LIST**📋](/TODO.md)
 
-# Content 📝
+## Content 📝
 - [X] Cogs Directory
 - [X] Database Directory
 - [X] Utils Directory
@@ -211,3 +211,9 @@ docker compose up -d
 docker compose down
 ```
 Deploy your app using the dockerimage: `USERNAME/REPO_NAME:production`
+
+## Running with python
+* Make sure you are inside the `root directory`
+```
+python run_bot.py
+```
