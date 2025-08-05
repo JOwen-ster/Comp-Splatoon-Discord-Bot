@@ -167,7 +167,7 @@ I have already done this for you so all you need to do is add more cogs/function
 ### DEV
 *run* (remove -d if you don't want to run your container as a background process)
 ```
-docker-compose up -d --build
+docker compose up -d --build
 ```
 This re-builds your image instead of using the existing to ensure most recent changes are used
 
