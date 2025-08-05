@@ -167,13 +167,17 @@ I have already done this for you so all you need to do is add more cogs/function
 **REPLACE `SERVICE` WITH WHATEVER YOUR SERVICE IS CALLED IN `docker-compose.yml`**
 
 ### DEV
-***run*** 
+***build***
+```
+docker compose build --no-cache
+```
 
+***build and run***
 * remove `-d` if you don't want to run your container as a `background process`*
 
 * `-d` means `detached mode` which `will delete the container after stopping it`
 ```
-docker compose build --no-cache SERVICE
+docker compose up -d --build --no-cache
 ```
 This re-builds your image instead of using the existing to ensure most recent changes are used
 
