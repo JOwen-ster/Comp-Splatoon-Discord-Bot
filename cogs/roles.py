@@ -1,8 +1,10 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+from cogs import extensions
 import utils.roledropdowns as rdd
 from utils.embeds import BotMessageEmbed, BotErrorEmbed
+from utils.loggingsetup import getlog
 import re
 
 
@@ -15,6 +17,11 @@ class Roles(commands.Cog):
         self.bot.add_view(rdd.RoleViewPowers(region_key='jp', bot=self.bot))
         self.bot.add_view(rdd.RoleViewPowers(region_key='na', bot=self.bot))
         self.bot.add_view(rdd.RoleViewRanks(bot=self.bot))
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.bot.cog_counter += 1
+        getlog().info(F'{__name__} ready ({self.bot.cog_counter}/{len(extensions)})')
 
     def filter_xp_roles(self, key: str, iterable, xp_min: int, xp_max: int):
         filtered_roles = []
