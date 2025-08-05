@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-import utils.roledropdown as rdd
+import utils.roledropdowns as rdd
 from utils.embeds import BotMessageEmbed, BotErrorEmbed
 import re
 
@@ -12,17 +12,21 @@ class Roles(commands.Cog):
 
     async def cog_load(self):
         # Just register the persistent views - that's it!
-        self.bot.add_view(rdd.RoleView(region_key='jp', bot=self.bot))
-        self.bot.add_view(rdd.RoleView(region_key='na', bot=self.bot))
+        self.bot.add_view(rdd.RoleViewPowers(region_key='jp', bot=self.bot))
+        self.bot.add_view(rdd.RoleViewPowers(region_key='na', bot=self.bot))
+        self.bot.add_view(rdd.RoleViewRanks(bot=self.bot))
 
-    def filter_xp_roles(self, key: str, iterable):
+    def filter_xp_roles(self, key: str, iterable, xp_min: int, xp_max: int):
         filtered_roles = []
         for role in iterable:
-            match = re.search(r'(\d+)', role.name)
-            xp = int(match.group(1)) if match else 0
-            if 2000 <= xp <= 2900 and "xp" in role.name.lower() and key in role.name.lower():
+            regex = re.search(r'(\d+)', role.name)
+            current_xp = int(regex.group(1)) if regex else 0
+            if xp_min <= current_xp <= xp_max and "xp" in role.name.lower() and key in role.name.lower():
                 filtered_roles.append(role)
         return filtered_roles
+
+    def filter_rank_roles(self, iterable):
+        return [role for role in iterable if 'rank' in role.name.lower()]
 
     @app_commands.command(name="jp-roles", description="Get a dropdown to assign/remove roles")
     async def role_dropdown_jp(self, interaction: discord.Interaction):
@@ -36,8 +40,8 @@ class Roles(commands.Cog):
             )
             return
 
-        jp_xp_roles = self.filter_xp_roles(key='jp', iterable=interaction.guild.roles)
-        view = rdd.RoleView(region_key='jp', bot=self.bot)
+        jp_xp_roles = self.filter_xp_roles(key='jp', iterable=interaction.guild.roles, xp_min=2000, xp_max=2900)
+        view = rdd.RoleViewPowers(region_key='jp', bot=self.bot)
         view.update_roles(jp_xp_roles)
         
         embed = BotMessageEmbed(title="Japan XP Roles", description="Select Your Takoroka Division Power")
@@ -55,11 +59,30 @@ class Roles(commands.Cog):
             )
             return
 
-        na_xp_roles = self.filter_xp_roles(key='na', iterable=interaction.guild.roles)
-        view = rdd.RoleView(region_key='na', bot=self.bot)
+        na_xp_roles = self.filter_xp_roles(key='na', iterable=interaction.guild.roles, xp_min=2000, xp_max=2900)
+        view = rdd.RoleViewPowers(region_key='na', bot=self.bot)
         view.update_roles(na_xp_roles)
         
         embed = BotMessageEmbed(title="Western XP Roles", description="Select Your Tentatek Division Power")
+        await interaction.response.send_message(embed=embed, view=view)
+
+    @app_commands.command(name='ranked-roles', description='Get a dropdown to assign/remove roles')
+    async def ranked_dropdown(self, interaction: discord.Interaction):
+        if interaction.user.id not in self.bot.whitelist:
+            return
+            
+        if not interaction.guild.me.guild_permissions.manage_roles:
+            await interaction.response.send_message(embed=BotErrorEmbed(
+                description="❌ I don't have the `Manage Roles` permission!"),
+                ephemeral=True
+            )
+            return
+
+        rank_roles = self.filter_rank_roles(iterable=interaction.guild.roles)
+        view = rdd.RoleViewRanks(bot=self.bot)
+        view.update_roles(rank_roles)
+        
+        embed = BotMessageEmbed(title="Ranked Roles", description="Select Your Ranked Division")
         await interaction.response.send_message(embed=embed, view=view)
 
 
