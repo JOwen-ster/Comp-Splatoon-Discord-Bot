@@ -1,6 +1,7 @@
 FROM python:3.12.6-bookworm
 
 RUN mkdir -p /usr/src/bot
+
 WORKDIR /usr/src/bot
 
 COPY . .

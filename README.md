@@ -165,17 +165,35 @@ I have already done this for you so all you need to do is add more cogs/function
 **REPLACE USERNAME and REPO_NAME with your own username and whatever you want to name the app**
 
 ### DEV
+*run* (remove -d if you dont want to run as you  container as a background process)
 ```
-docker-compose up --build
+docker-compose up -d --build
 ```
+This re-builds your image instead of using the existing to ensure most recent changes are used
 
-This uses the `build: .` command
+*stop*
+```
+docker compose down
+```
 
 ### PRODUCTION
+*build*
 ```
-docker build -t REPLACE/REPO_NAME:production .
+docker build -t USERNAME/REPO_NAME:production .
 ```
+
+*push to dockerhub* (run `docker login` first)
 ```
-docker push owenster/comp_splatoon_bot:production
+docker push USERNAME/comp_splatoon_bot:production
+```
+
+*use latest push*
+```
+docker compose pull
+```
+
+*run*
+```
+docker compose up -d
 ```
 Deploy your app using the dockerimage: `USERNAME/REPO_NAME:production`
