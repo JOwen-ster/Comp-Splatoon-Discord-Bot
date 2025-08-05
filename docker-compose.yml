@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   splatoon_comp_bot:
+    container_name: 'Competitive-Splatoon-Discord-Bot'
     build: .
     image: owenster/comp_splatoon_bot:production
     env_file: .env
