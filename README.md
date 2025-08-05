@@ -52,17 +52,17 @@ Template/
 ***CLONE THIS REPOSITORY***
 - [x] HTTPS
 ```
-git clone https://github.com/JOwen-ster/Discord.py-Bot-TEMPLATE.git
+git clone https://github.com/JOwen-ster/Comp-Splatoon-Discord-Bot.git
 ```
 
 - [X] SSH
 ```
-git clone git@github.com:JOwen-ster/Discord.py-Bot-TEMPLATE.git
+git clone git@github.com:JOwen-ster/Comp-Splatoon-Discord-Bot.git
 ```
 
 - [X] GitHub CLI
 ```
-gh repo clone JOwen-ster/Discord.py-Bot-TEMPLATE
+gh repo clone JOwen-ster/Comp-Splatoon-Discord-Bot
 ```
 
 ![Discord_Python_Logo](https://images.opencollective.com/discordpy/25fb26d/logo/256.png)
