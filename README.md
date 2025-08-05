@@ -166,8 +166,10 @@ I have already done this for you so all you need to do is add more cogs/function
 
 ### DEV
 ***run*** 
-(remove -d if you don't want to run your container as a background process)
-(-d means detached mode which will delete the container after stopping it)
+
+* remove `-d` if you don't want to run your container as a `background process`*
+
+* `-d` means `detached mode` which `will delete the container after stopping it`
 ```
 docker compose up -d --build
 ```
