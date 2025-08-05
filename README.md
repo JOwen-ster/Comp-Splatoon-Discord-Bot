@@ -167,13 +167,18 @@ I have already done this for you so all you need to do is add more cogs/function
 **DEV**
 ```
 docker build -t USERNAME/REPO_NAME:production .
+```
+```
 docker-compose up --build
 ```
+
 This uses the `build: .` command
 
 **PRODUCTION**
 ```
 docker build -t REPLACE/REPO_NAME:production .
+```
+```
 docker push owenster/comp_splatoon_bot:production
 ```
 Deploy your app using the dockerimage: `USERNAME/REPO_NAME:production`
