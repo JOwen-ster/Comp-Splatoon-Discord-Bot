@@ -164,7 +164,7 @@ I have already done this for you so all you need to do is add more cogs/function
 
 **REPLACE USERNAME and REPO_NAME with your own username and whatever you want to name the app**
 
-**DEV**
+### DEV
 ```
 docker build -t USERNAME/REPO_NAME:production .
 ```
@@ -174,7 +174,7 @@ docker-compose up --build
 
 This uses the `build: .` command
 
-**PRODUCTION**
+### PRODUCTION
 ```
 docker build -t REPLACE/REPO_NAME:production .
 ```
