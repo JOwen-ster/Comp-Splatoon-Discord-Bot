@@ -20,6 +20,7 @@ async def main() -> None:
 
     # Setup Discord Bot Client
     intents: discord.Intents = discord.Intents.default()
+    intents.members = True
     intents.message_content = True
     discord_bot = botclient.Bot(command_prefix='}', intents=intents, help_command=None)
 

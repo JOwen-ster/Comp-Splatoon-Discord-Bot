@@ -15,7 +15,16 @@ class Moderation(commands.Cog):
         self.bot.cog_counter += 1
         getlog().info(F'{__name__} ready ({self.bot.cog_counter}/{len(extensions)})')
 
-    @app_commands.command(name='post', description='Create a embed post!')
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        if member.bot:
+            try:
+                await member.ban(reason='BOT auto ban')
+                getlog().info(f'{member.name} was banned due to being a BOT')
+            except Exception as e:
+                getlog().error(f'{e}')
+
+    @app_commands.command(name='post', description='Create an embed post!')
     @app_commands.describe(message='Please input your message', channel_id='channel to send the message')
     async def create_post(self, interaction: discord.Interaction, message: str, channel_id: str):
         if interaction.user.id not in self.bot.whitelist:
@@ -33,7 +42,7 @@ class Moderation(commands.Cog):
             except Exception as e:
                 getlog().error(f'{e}')
 
-    @app_commands.command(name='code', description='Link to this bots source code')
+    @app_commands.command(name='code', description="Link to this bot's source code")
     async def code_cmd(self, interaction: discord.Interaction):
         await interaction.response.send_message(embed=BotMessageEmbed(
             title='Bot developed by @typos. on Discord',

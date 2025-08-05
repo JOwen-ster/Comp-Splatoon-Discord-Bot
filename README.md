@@ -19,6 +19,9 @@ Template/
 │    ├─── cog2.py
 │    ├─── cog3.py
 │    ├─── ...
+├─── db/
+│    ├─── __init__.py
+│    ├─── connection.py
 ├─── utils/
 │    ├─── __init__.py
 │    ├─── util1.py

@@ -52,7 +52,7 @@ class SendMessages(commands.Cog):
 
     @app_commands.command(name='fillout-form', description='Fill out and submit a form to the server!')
     async def filloutform(self, interaction: discord.Interaction):
-        await interaction.response.send_modal(InfoModal())\
+        await interaction.response.send_modal(InfoModal())
 
     @app_commands.command(name='choices', description='Another app command with choices')
     async def filloutform(self, interaction: discord.Interaction,
