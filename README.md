@@ -175,7 +175,7 @@ docker compose build --no-cache
 
 * `-d` means `detached mode` which `will delete the container after stopping it`
 ```
-docker compose up -d --build --no-cache
+docker compose build --no-cache && docker compose up -d
 ```
 This re-builds your image instead of using the existing to ensure most recent changes are used
 
