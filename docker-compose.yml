@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   splatoon_comp_bot:
     container_name: 'Competitive-Splatoon-Discord-Bot'
