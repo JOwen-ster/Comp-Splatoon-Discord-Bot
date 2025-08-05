@@ -7,7 +7,9 @@ class RoleSelectPowers(discord.ui.Select):
         super().__init__(
             custom_id=f"role_select_{region_key}",
             placeholder="Choose a role to assign (removes previous role)...",
-            options=[discord.SelectOption(label="Loading...", value="loading")]
+            options=[discord.SelectOption(label="Loading...", value="loading")],
+            min_values=1,
+            max_values=1
         )
         self.region_key = region_key
         self.bot = bot
@@ -77,7 +79,9 @@ class RoleSelectRanks(discord.ui.Select):
         super().__init__(
             custom_id="role_select_ranks",
             placeholder="Choose a role to assign (removes previous role)...",
-            options=[discord.SelectOption(label="Loading...", value="loading")]
+            options=[discord.SelectOption(label="Loading...", value="loading")],
+            min_values=1,
+            max_values=1
         )
         self.bot = bot
         self.assignable_roles = {}

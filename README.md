@@ -5,7 +5,7 @@ A repo containing a standard file structure template for a Discord bot!
 
 [**TODO LIST**📋](/TODO.md)
 
-# Content
+# Content 📝
 - [X] Cogs Directory
 - [X] Database Directory
 - [X] Utils Directory
@@ -41,7 +41,7 @@ Template/
 > [!NOTE]
 > Bot file is used to create a custom Discord Bot Client. This lets you import your bot into different files and make calls when your Client is created.
 
-# **You will need...**
+# You will need... 🛠️
 - A [Discord](https://discord.com/) account
 - [Python](https://www.python.org/) installed
   - If you want to use JavaScript to make a Discord bot, I recommend using this [template](https://github.com/PillowGit/base-discord-js-bot) made by [@PillowGit](https://github.com/PillowGit) for the coding portion
@@ -49,7 +49,7 @@ Template/
 - A IDE to edit and run code (Like Visual Studio Code)
 
 
-***CLONE THIS REPOSITORY***
+***CLONE THIS REPOSITORY*** 🖨️
 - [x] HTTPS
 ```
 git clone https://github.com/JOwen-ster/Comp-Splatoon-Discord-Bot.git
@@ -67,7 +67,7 @@ gh repo clone JOwen-ster/Comp-Splatoon-Discord-Bot
 
 ![Discord_Python_Logo](https://images.opencollective.com/discordpy/25fb26d/logo/256.png)
 
-## Creating Your Application
+## Creating Your Application ✨
 Head over to the [discord developer page](https://discord.com/developers/applications), log in, and at the top right of your screen click `New Application`, type the name of your Discord bot, and then click `create`
 
 > [!NOTE]
@@ -101,17 +101,17 @@ Under `Install Link`, there is a link you send to others. When clicked, that use
 > Go to the `Bot` tab.
 > Click `Reset Token` near the top of the page
 
-# ***__COPY AND SAVE THIS TOKEN SOMEWHERE SECURE AND SOMEWHERE YOU CAN ACCESS IT__***
+# *__COPY AND SAVE THIS TOKEN SOMEWHERE SECURE AND SOMEWHERE YOU CAN ACCESS IT__*
 
 > [!CAUTION]
-> # **THIS TOKEN IS HOW TO CONNECT TO YOUR APPLICATION WITH CODE, NO ONE NEEDS ANYTHING ELSE TO CONNECT/LOG INTO YOUR BOT EXCEPT THE MOST RECENT TOKEN. NEVER POST IT OR YOU RISK YOUR BOT GETTING HIJACKED**
+> # THIS TOKEN IS HOW TO CONNECT TO YOUR APPLICATION WITH CODE, NO ONE NEEDS ANYTHING ELSE TO CONNECT/LOG INTO YOUR BOT EXCEPT THE MOST RECENT TOKEN. NEVER POST IT OR YOU RISK YOUR BOT GETTING HIJACKED
 
 > [!CAUTION]
 > If you do not type `.env` in your `.gitignore` file, (the `.env` file is where you should put your token) , then GitHub bots **will** scrape your token (it has happened to me) and may use it. Discord will hopefully send you a message very fast saying they caught it and reset it since they are also scraping for Discord Bot Tokens to watch out for you and keeping your bots secure :)
 
 ![image](https://github.com/JOwen-ster/Discord_Bot_Workshop_2024/assets/111905194/79737d0c-b11f-4ee2-a0e2-f23a2d7f92f7)
 
-## Coding the Actual Discord Bot
+## Coding the Actual Discord Bot 🤖
 By the end, you will have a bot that has a simple slash command that sends messages in an embed, a simple slash command that uses a modal/form, a simple slash command that has buttons and a dropdown menu, a background task that will always be updating the bots Discord status to display how many servers it is in, and a logging setup for all actions the bot does.
 We will be using the [discord.py](https://discordpy.readthedocs.io/en/stable/) API wrapper in this workshop.
 
@@ -145,7 +145,7 @@ pip install -r requirements.txt
 
 After you have successfully installed the libraries...
 
-## **Open your favorite code IDE!**
+## Open your favorite code IDE! 💻
 
 Create a new file named `.env` (no name before the dot) and put the following in it.
 
@@ -160,7 +160,7 @@ Normally you would create a new file named `.gitignore` and put the following in
 
 I have already done this for you so all you need to do is add more cogs/functionality and then run [run_bot.py](/run_bot.py)!
 
-## RUNNING WITH DOCKER
+## Running With Docker 🐋
 
 **REPLACE `USERNAME` and `REPO_NAME` with your own username and whatever you want to name the app**
 
