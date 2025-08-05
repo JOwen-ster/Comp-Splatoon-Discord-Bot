@@ -164,8 +164,6 @@ I have already done this for you so all you need to do is add more cogs/function
 
 **REPLACE `USERNAME` and `REPO_NAME` with your own username and whatever you want to name the app**
 
-**REPLACE `SERVICE` WITH WHATEVER YOUR SERVICE IS CALLED IN `docker-compose.yml`**
-
 ### DEV
 ***build***
 ```
@@ -189,7 +187,7 @@ docker compose down
 ### PRODUCTION
 ***build***
 ```
-docker compose build --no-cache SERVICE
+docker compose build --no-cache
 ```
 
 ***push to dockerhub*** (run `docker login` first)
