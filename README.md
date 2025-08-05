@@ -169,8 +169,9 @@ docker-compose up --build
 This uses the `build: .` command
 
 **PRODUCTION**
+**REPLACE USERNAME and REPO_NAME with your own username and whatever you want to name the app**
 ```
-docker build -t owenster/comp_splatoon_bot:production .
+docker build -t REPLACE/REPO_NAME:production .
 docker push owenster/comp_splatoon_bot:production
 ```
 Deploy using image: `owenster/comp_splatoon_bot:production`
