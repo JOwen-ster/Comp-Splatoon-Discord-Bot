@@ -162,16 +162,18 @@ I have already done this for you so all you need to do is add more cogs/function
 
 ## RUNNING WITH DOCKER
 
+**REPLACE USERNAME and REPO_NAME with your own username and whatever you want to name the app**
+
 **DEV**
 ```
+docker build -t USERNAME/REPO_NAME:production .
 docker-compose up --build
 ```
 This uses the `build: .` command
 
 **PRODUCTION**
-**REPLACE USERNAME and REPO_NAME with your own username and whatever you want to name the app**
 ```
 docker build -t REPLACE/REPO_NAME:production .
 docker push owenster/comp_splatoon_bot:production
 ```
-Deploy using image: `owenster/comp_splatoon_bot:production`
+Deploy your app using the dockerimage: `USERNAME/REPO_NAME:production`
