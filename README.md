@@ -165,34 +165,41 @@ I have already done this for you so all you need to do is add more cogs/function
 **REPLACE USERNAME and REPO_NAME with your own username and whatever you want to name the app**
 
 ### DEV
-*run* (remove -d if you don't want to run your container as a background process)
+***run*** 
+(remove -d if you don't want to run your container as a background process)
+(-d means detached mode which will delete the container after stopping it)
 ```
 docker compose up -d --build
 ```
 This re-builds your image instead of using the existing to ensure most recent changes are used
 
-*stop*
+***stop***
 ```
 docker compose down
 ```
 
 ### PRODUCTION
-*build*
+***build***
 ```
 docker build -t USERNAME/REPO_NAME:production .
 ```
 
-*push to dockerhub* (run `docker login` first)
+***push to dockerhub*** (run `docker login` first)
 ```
 docker push USERNAME/REPO_NAME:production
 ```
 
-*use latest push*
+***use latest push***
 ```
 docker pull
 ```
 
-*run*
+***run***
+```
+docker compose up -d
+```
+
+***stop***
 ```
 docker compose up -d
 ```
