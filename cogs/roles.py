@@ -73,11 +73,11 @@ class Roles(commands.Cog):
         embed = BotMessageEmbed(title="Western XP Roles", description="Select Your Tentatek Division Power")
         await interaction.response.send_message(embed=embed, view=view)
 
-    @app_commands.command(name='ranked-roles', description='Get a dropdown to assign/remove roles')
+    @app_commands.command(name='ranked-roles', description='Get a dropdown of ranks to assign/remove roles')
     async def ranked_dropdown(self, interaction: discord.Interaction):
         if interaction.user.id not in self.bot.whitelist:
             return
-            
+
         if not interaction.guild.me.guild_permissions.manage_roles:
             await interaction.response.send_message(embed=BotErrorEmbed(
                 description="❌ I don't have the `Manage Roles` permission!"),
@@ -92,6 +92,11 @@ class Roles(commands.Cog):
         embed = BotMessageEmbed(title="Ranked Roles", description="Select Your Ranked Division")
         await interaction.response.send_message(embed=embed, view=view)
 
+    @app_commands.command(name='ping-roles', description='Get a drodown of pingable roles to assign/remove')
+    async def ping_dropdown(self, interaction: discord.Interaction, list_ids: str):
+        # the list_ids param wil be a comma seperated list in the form of a string with discord role ids.
+        embed = BotMessageEmbed(title="Pingable Roles", description="Select All Roles You Want Pings For")
+        await interaction.response.send_message(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Roles(bot))
