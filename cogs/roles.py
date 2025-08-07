@@ -20,13 +20,20 @@ import re
 # CREATE AUTO DELETE LISTENER EVENT TO CHECK IF THE MESSAGE ID IS IN THE DICT IF IT IS THEN REMOVE IT FROM THE DICT ANID SQLITE
 # CREATE A COMMAND THAT GIVES MESSAGE LINKS TO ALL VIEWS FOR THE CURRENT SERVER
 # CHANGE THE REGION ATTRIBUTE TO IDENTIFIER AND USE IT IN THE CUSTOM custom_id=f"rs_{identifier}_{guild_id}"
+# STORE EACH VIEW IN SQLITE. 1 TABLE FOR EACH TYPE OF VIEW SUCH AS NA JP RANKED PINGS. Store guild id and message id for that view
+# Read through database when bot starts and check each message id in its corresponding guild to see if it exists.
+#If the view doesnt exist then the view got deleted and you can drop that row for that view
+# Add the views guild id and message id to db if a view command gets ran
+# USE AIOSQLITE FOR ASYNC SQLITE
 
 class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     async def cog_load(self):
-        # Just register the persistent views - that's it!
+        # Dont do this anymore, FIX IT
+        # TODO: Add the view dynamically when its created not at load time, call add_view when using a view creation command
+        # then pass in its guild id to use in the custom id
         self.bot.add_view(rdd.RoleViewPowers(region_key='jp', bot=self.bot))
         self.bot.add_view(rdd.RoleViewPowers(region_key='na', bot=self.bot))
         self.bot.add_view(rdd.RoleViewRanks(bot=self.bot))
