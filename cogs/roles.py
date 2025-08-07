@@ -7,6 +7,19 @@ from utils.embeds import BotMessageEmbed, BotErrorEmbed
 from utils.loggingsetup import getlog
 import re
 
+# MAKE COMMANDS WORK FOR MANY SERVERS
+# CREATE CUSTOM ID USING GUILD ID
+# TRYING TO USE THE COMMAND WHEN A VIEW OF THAT COMMAND IS ALREADY PRESENT SHOULD DELETE THAT ORIGINAL VIEW MESSAGE
+#TAKE IT OUT OF THE DICTIONARY (OR SQLITE) (STORE THE GUILD ID AND THE MESSAGE ID TO INSTA DELETE OR ACCESS THE VIEW)
+        # self.persistent_messages = {
+        #     'jp': {},  # guild_id: message_id, ...
+        #     'na': {},  # guild_id: message_id, ...
+        #     'ranks': {}  # guild_id: message_id, ...
+        # }
+#CREATE THE VIEW IN THE CHANNEL WHERE THE COMMAND WAS USED
+# CREATE AUTO DELETE LISTENER EVENT TO CHECK IF THE MESSAGE ID IS IN THE DICT IF IT IS THEN REMOVE IT FROM THE DICT ANID SQLITE
+# CREATE A COMMAND THAT GIVES MESSAGE LINKS TO ALL VIEWS FOR THE CURRENT SERVER
+# CHANGE THE REGION ATTRIBUTE TO IDENTIFIER AND USE IT IN THE CUSTOM custom_id=f"rs_{identifier}_{guild_id}"
 
 class Roles(commands.Cog):
     def __init__(self, bot):
