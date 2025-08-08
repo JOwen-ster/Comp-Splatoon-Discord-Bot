@@ -2,7 +2,7 @@ import asyncio
 import botclient
 import discord
 import asyncpg
-import db.connection
+import db.postgre_connection
 from utils.loggingsetup import getlog
 from dotenv import load_dotenv
 from os import getenv
@@ -24,7 +24,7 @@ async def main() -> None:
     discord_bot = botclient.Bot(command_prefix='}', intents=intents, help_command=None)
 
     # Setup Postgre Database
-    db_creds = list(db.connection.get_db_credentials().values())
+    db_creds = list(db.postgre_connection.get_db_credentials().values())
 
     if all(db_creds):
         # Data Source Name
