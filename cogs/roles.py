@@ -36,28 +36,29 @@ class Roles(commands.Cog):
         self.bot.loop.create_task(self.restore_views())
 
     async def restore_views(self):
+        # USE CHANNEL ID AND GUILD ID INSTEAD OF ITERATING THROUGH CHANNELS AND GUILDS TO CHECK IF A VIEW WAS DELETED WHEN THE BOT WAS OFFLINE.
         await self.bot.wait_until_ready()
         getlog().info("Loading persisted views from database...")
-    
+
         rows = await fetch_all_views()  # returns (guild_id, channel_id, view_type, message_id)
-    
+
         for guild_id, channel_id, view_type, message_id in rows:
             getlog().debug(f"Attempting to restore: guild={guild_id}, channel={channel_id}, type={view_type}, message={message_id}")
-    
+
             # Get guild
             guild = self.bot.get_guild(guild_id)
             if not guild:
                 getlog().warning(f"Guild {guild_id} not found. Removing this view from DB.")
                 await delete_view(message_id, guild_id)
                 continue
-            
+
             # Get channel
             channel = guild.get_channel(channel_id)
             if not channel:
                 getlog().warning(f"Channel {channel_id} not found in guild {guild_id}. Removing this view from DB.")
                 await delete_view(message_id, guild_id)
                 continue
-            
+
             # Get message
             try:
                 message = await channel.fetch_message(message_id)
@@ -71,7 +72,7 @@ class Roles(commands.Cog):
             except discord.HTTPException as e:
                 getlog().error(f"HTTP error while fetching message {message_id} in guild {guild_id}: {e}")
                 continue
-            
+
             # Restore correct view
             try:
                 if view_type == "na":
@@ -89,18 +90,18 @@ class Roles(commands.Cog):
                     )
                     view.update_roles(roles)
                     await message.edit(view=view)
-    
+
                 # elif view_type == "jp":
                 #     # Similar process for JP view...
                 # elif view_type == "ranked":
                 #     # Similar process for ranked view...
-    
+
                 else:
                     getlog().warning(f"Unknown view type '{view_type}' in guild {guild_id}. Skipping.")
                     continue
-                
+
                 getlog().info(f"Successfully restored {view_type} view in guild {guild_id} (message {message_id}).")
-    
+
             except Exception as e:
                 getlog().error(f"Failed to restore view {view_type} in guild {guild_id}: {e}")
 
