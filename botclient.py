@@ -1,6 +1,7 @@
 from cogs import extensions
 import asyncpg
 from discord.ext import commands
+from db.persistent_db import setup_db
 from utils.loggingsetup import getlog
 
 
@@ -18,6 +19,7 @@ class Bot(commands.Bot):
 
     async def setup_hook(self) -> None:
         getlog().info('Running bot setup_hook...')
+        await setup_db()
         for i, cog in enumerate(extensions, 1):
             try:
                 # Load all added cogs into the bot
@@ -27,7 +29,7 @@ class Bot(commands.Bot):
                 getlog().error(F'Could not load {cog} cog ({i}/{len(extensions)}): {e}')
         
         # Persistent views are automatically set up when cogs with persistent views are loaded
-        # The RoleCog.cog_load() method handles this
+        # The cog_load() method handles this
         getlog().info('Ran bot setup_hook!')
 
     async def on_ready(self) -> None:

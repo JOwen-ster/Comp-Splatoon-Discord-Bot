@@ -58,10 +58,3 @@ async def main() -> None:
             print(error)
 
 asyncio.run(main())
-
-# Examples
-# https://github.com/Rapptz/discord.py/tree/master/docs
-# https://github.com/Rapptz/discord.py/tree/master/examples
-
-# COG EXAMPLE
-# https://github.com/Rapptz/discord.py/blob/master/docs/ext/commands/cogs.rst

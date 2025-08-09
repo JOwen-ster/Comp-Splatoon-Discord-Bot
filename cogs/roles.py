@@ -3,8 +3,9 @@ from discord.ext import commands
 from discord import app_commands
 from cogs import extensions
 import utils.roledropdowns as rdd
-from utils.embeds import BotMessageEmbed, BotErrorEmbed
+from utils.embeds import BotMessageEmbed, BotErrorEmbed, BotConfirmationEmbed
 from utils.loggingsetup import getlog
+from db.persistent_db import ViewType, fetch_view, insert_view, delete_view, fetch_all_views, print_all_views
 import re
 
 
@@ -32,17 +33,99 @@ class Roles(commands.Cog):
         self.bot = bot
 
     async def cog_load(self):
-        # Dont do this anymore, FIX IT
-        # TODO: Add the view dynamically when its created not at load time, call add_view when using a view creation command
-        # then pass in its guild id to use in the custom id
-        self.bot.add_view(rdd.RoleViewPowers(region_key='jp', bot=self.bot))
-        self.bot.add_view(rdd.RoleViewPowers(region_key='na', bot=self.bot))
-        self.bot.add_view(rdd.RoleViewRanks(bot=self.bot))
+        self.bot.loop.create_task(self.restore_views())
+
+    async def restore_views(self):
+        await self.bot.wait_until_ready()
+        getlog().info("Loading persisted views from database...")
+    
+        rows = await fetch_all_views()  # returns (guild_id, channel_id, view_type, message_id)
+    
+        for guild_id, channel_id, view_type, message_id in rows:
+            getlog().debug(f"Attempting to restore: guild={guild_id}, channel={channel_id}, type={view_type}, message={message_id}")
+    
+            # Get guild
+            guild = self.bot.get_guild(guild_id)
+            if not guild:
+                getlog().warning(f"Guild {guild_id} not found. Removing this view from DB.")
+                await delete_view(message_id, guild_id)
+                continue
+            
+            # Get channel
+            channel = guild.get_channel(channel_id)
+            if not channel:
+                getlog().warning(f"Channel {channel_id} not found in guild {guild_id}. Removing this view from DB.")
+                await delete_view(message_id, guild_id)
+                continue
+            
+            # Get message
+            try:
+                message = await channel.fetch_message(message_id)
+            except discord.NotFound:
+                getlog().warning(f"Message {message_id} not found in channel {channel_id} (guild {guild_id}). Removing this view from DB.")
+                await delete_view(message_id, guild_id)
+                continue
+            except discord.Forbidden:
+                getlog().warning(f"No permission to access channel {channel_id} in guild {guild_id}. Skipping restoration.")
+                continue
+            except discord.HTTPException as e:
+                getlog().error(f"HTTP error while fetching message {message_id} in guild {guild_id}: {e}")
+                continue
+            
+            # Restore correct view
+            try:
+                if view_type == "na":
+                    roles = self.filter_xp_roles(
+                        key='na',
+                        iterable=guild.roles,
+                        xp_min=2000,
+                        xp_max=2900
+                    )
+                    view = rdd.RoleViewPowers(
+                        region_key='na',
+                        guild_id=guild_id,
+                        msg_id=message_id,
+                        bot=self.bot
+                    )
+                    view.update_roles(roles)
+                    await message.edit(view=view)
+    
+                # elif view_type == "jp":
+                #     # Similar process for JP view...
+                # elif view_type == "ranked":
+                #     # Similar process for ranked view...
+    
+                else:
+                    getlog().warning(f"Unknown view type '{view_type}' in guild {guild_id}. Skipping.")
+                    continue
+                
+                getlog().info(f"Successfully restored {view_type} view in guild {guild_id} (message {message_id}).")
+    
+            except Exception as e:
+                getlog().error(f"Failed to restore view {view_type} in guild {guild_id}: {e}")
+
+
 
     @commands.Cog.listener()
     async def on_ready(self):
         self.bot.cog_counter += 1
         getlog().info(F'{__name__} ready ({self.bot.cog_counter}/{len(extensions)})')
+
+    @commands.Cog.listener()
+    async def on_raw_message_delete(self, payload):
+        """
+        Deletes the corresponding view entry in the database
+        when a stored view message is deleted.
+        """
+        # payload contains guild_id and message_id
+        guild_id = payload.guild_id
+        message_id = payload.message_id
+
+        # ignore dms
+        if not guild_id:
+            return
+
+        await delete_view(message_id, guild_id)
 
     def filter_xp_roles(self, key: str, iterable, xp_min: int, xp_max: int):
         filtered_roles = []
@@ -56,68 +139,112 @@ class Roles(commands.Cog):
     def filter_rank_roles(self, iterable):
         return [role for role in iterable if 'rank' in role.name.lower()]
 
-    @app_commands.command(name="jp-roles", description="Get a dropdown to assign/remove roles")
-    async def role_dropdown_jp(self, interaction: discord.Interaction):
-        if interaction.user.id not in self.bot.whitelist:
-            return
+    # @app_commands.command(name="jp-roles", description="Get a dropdown to assign/remove roles")
+    # async def role_dropdown_jp(self, interaction: discord.Interaction):
+    #     if interaction.user.id not in self.bot.whitelist:
+    #         return
 
-        if not interaction.guild.me.guild_permissions.manage_roles:
-            await interaction.response.send_message(embed=BotErrorEmbed(
-                description="❌ I don't have the `Manage Roles` permission!"),
-                ephemeral=True
-            )
-            return
+    #     if not interaction.guild.me.guild_permissions.manage_roles:
+    #         await interaction.response.send_message(embed=BotErrorEmbed(
+    #             description="❌ I don't have the `Manage Roles` permission!"),
+    #             ephemeral=True
+    #         )
+    #         return
 
-        jp_xp_roles = self.filter_xp_roles(key='jp', iterable=interaction.guild.roles, xp_min=2000, xp_max=2900)
-        view = rdd.RoleViewPowers(region_key='jp', bot=self.bot)
-        view.update_roles(jp_xp_roles)
+    #     jp_xp_roles = self.filter_xp_roles(key='jp', iterable=interaction.guild.roles, xp_min=2000, xp_max=2900)
+    #     view = rdd.RoleViewPowers(region_key='jp', bot=self.bot)
+    #     view.update_roles(jp_xp_roles)
         
-        embed = BotMessageEmbed(title="Japan XP Roles", description="Select Your Takoroka Division Power")
-        await interaction.response.send_message(embed=embed, view=view)
+    #     embed = BotMessageEmbed(title="Japan XP Roles", description="Select Your Takoroka Division Power")
+    #     await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command(name="na-roles", description="Get a dropdown to assign/remove roles")
     async def role_dropdown_na(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
         if interaction.user.id not in self.bot.whitelist:
             return
 
-        if not interaction.guild.me.guild_permissions.manage_roles:
-            await interaction.response.send_message(embed=BotErrorEmbed(
-                description="❌ I don't have the `Manage Roles` permission!"),
+        if not interaction.guild.me.guild_permissions.manage_roles or not interaction.guild.me.guild_permissions.administrator:
+            await interaction.followup.send(
+                embed=BotErrorEmbed(description="❌ I don't have the `Manage Roles` permission!"),
                 ephemeral=True
             )
             return
 
-        na_xp_roles = self.filter_xp_roles(key='na', iterable=interaction.guild.roles, xp_min=2000, xp_max=2900)
-        view = rdd.RoleViewPowers(region_key='na', bot=self.bot)
+        # Delete old view if it exists
+        old_view_data = await fetch_view(ViewType.NA, interaction.guild.id)
+        if old_view_data:
+            old_message_id = old_view_data[2]
+            try:
+                old_msg = await interaction.channel.fetch_message(old_message_id)
+                await old_msg.delete()
+            except discord.NotFound:
+                pass
+
+        # Prepare new view
+        na_xp_roles = self.filter_xp_roles(
+            key='na',
+            iterable=interaction.guild.roles,
+            xp_min=2000,
+            xp_max=2900
+        )
+
+        title_embed = BotMessageEmbed(
+            title="Western XP Roles",
+            description="Select Your Tentatek Division Power"
+        )
+
+        post = await interaction.channel.send(embed=title_embed)
+        print(post.id)
+
+        view = rdd.RoleViewPowers(
+            region_key='na',
+            guild_id=interaction.guild.id,
+            msg_id=post.id,
+            bot=self.bot
+        )
         view.update_roles(na_xp_roles)
+
+        # Update drodown with view
+        await post.edit(embed=title_embed, view=view)
+
+        # Store in DB
+        await insert_view(
+            ViewType.NA,
+            interaction.guild.id,
+            interaction.channel.id,  # <- added channel_id here
+            post.id,
+            self.bot
+        )
+
+        # Register the view dynamically
         
-        embed = BotMessageEmbed(title="Western XP Roles", description="Select Your Tentatek Division Power")
-        await interaction.response.send_message(embed=embed, view=view)
+        await interaction.followup.send(embed=BotConfirmationEmbed(description='✅ Sent New Dropdown!'))
 
-    @app_commands.command(name='ranked-roles', description='Get a dropdown of ranks to assign/remove roles')
-    async def ranked_dropdown(self, interaction: discord.Interaction):
-        if interaction.user.id not in self.bot.whitelist:
-            return
+    # @app_commands.command(name='ranked-roles', description='Get a dropdown of ranks to assign/remove roles')
+    # async def ranked_dropdown(self, interaction: discord.Interaction):
+    #     if interaction.user.id not in self.bot.whitelist:
+    #         return
 
-        if not interaction.guild.me.guild_permissions.manage_roles:
-            await interaction.response.send_message(embed=BotErrorEmbed(
-                description="❌ I don't have the `Manage Roles` permission!"),
-                ephemeral=True
-            )
-            return
+    #     if not interaction.guild.me.guild_permissions.manage_roles:
+    #         await interaction.response.send_message(embed=BotErrorEmbed(
+    #             description="❌ I don't have the `Manage Roles` permission!"),
+    #             ephemeral=True
+    #         )
+    #         return
 
-        rank_roles = self.filter_rank_roles(iterable=interaction.guild.roles)
-        view = rdd.RoleViewRanks(bot=self.bot)
-        view.update_roles(rank_roles)
+    #     rank_roles = self.filter_rank_roles(iterable=interaction.guild.roles)
+    #     view = rdd.RoleViewRanks(bot=self.bot)
+    #     view.update_roles(rank_roles)
         
-        embed = BotMessageEmbed(title="Ranked Roles", description="Select Your Ranked Division")
-        await interaction.response.send_message(embed=embed, view=view)
+    #     embed = BotMessageEmbed(title="Ranked Roles", description="Select Your Ranked Division")
+    #     await interaction.response.send_message(embed=embed, view=view)
 
-    @app_commands.command(name='ping-roles', description='Get a drodown of pingable roles to assign/remove')
-    async def ping_dropdown(self, interaction: discord.Interaction, list_ids: str):
-        # the list_ids param wil be a comma seperated list in the form of a string with discord role ids.
-        embed = BotMessageEmbed(title="Pingable Roles", description="Select All Roles You Want Pings For")
-        await interaction.response.send_message(embed=embed)
+    # @app_commands.command(name='ping-roles', description='Get a drodown of pingable roles to assign/remove')
+    # async def ping_dropdown(self, interaction: discord.Interaction, list_ids: str):
+    #     # the list_ids param wil be a comma seperated list in the form of a string with discord role ids.
+    #     embed = BotMessageEmbed(title="Pingable Roles", description="Select All Roles You Want Pings For")
+    #     await interaction.response.send_message(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Roles(bot))
