@@ -88,39 +88,9 @@ async def insert_view(view_type: ViewType, guild_id: int, channel_id: int, messa
 async def delete_view(message_id: int, guild_id: int) -> None:
     getlog().info(f"Deleting view from DB: guild_id={guild_id}, message_id={message_id}")
     async with aiosqlite.connect(DB_NAME) as db:
-        await db.execute("DELETE FROM views WHERE message_id = ? AND guild_id = ?", (message_id, guild_id))
+        res = await db.execute("DELETE FROM views WHERE message_id = ? AND guild_id = ?", (message_id, guild_id))
         await db.commit()
-    getlog().info("View deleted from DB.")
-
-async def cleanup_views(bot) -> None:
-    pass
-    # getlog().info("Starting cleanup of views...")
-    # async with aiosqlite.connect(DB_NAME) as db:
-    #     async with db.execute("SELECT id, guild_id, channel_id, view_type, message_id FROM views") as cursor:
-    #         rows = await cursor.fetchall()
-
-    #     for row in rows:
-    #         row_id, guild_id, channel_id, view_type, message_id = row
-    #         guild = bot.get_guild(guild_id)
-    #         if not guild:
-    #             getlog().info(f"Guild not found, deleting view id {row_id} from DB")
-    #             await db.execute("DELETE FROM views WHERE id = ?", (row_id,))
-    #             continue
-
-    #         channel = guild.get_channel(channel_id)
-    #         if not channel:
-    #             getlog().info(f"Channel not found in guild {guild_id}, deleting view id {row_id} from DB")
-    #             await db.execute("DELETE FROM views WHERE id = ?", (row_id,))
-    #             continue
-
-    #         try:
-    #             await channel.fetch_message(message_id)
-    #         except Exception:
-    #             getlog().info(f"Message {message_id} not found in channel {channel_id}, deleting view id {row_id} from DB")
-    #             await db.execute("DELETE FROM views WHERE id = ?", (row_id,))
-
-    #     await db.commit()
-    # getlog().info("Cleanup complete.")
+    getlog().info(f"{res}")
 
 async def custom_query(sql_stmt: str, *params) -> Union[None, List[Tuple]]:
     getlog().info(f"Running custom query: {sql_stmt} with params: {params}")
