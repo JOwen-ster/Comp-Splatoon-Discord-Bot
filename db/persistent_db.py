@@ -6,6 +6,7 @@ from utils.loggingsetup import getlog
 DB_NAME = "views.db"
 
 class ViewType(Enum):
+    PING = 'ping'
     RANK = "rank"
     NA = "na"
     JP = "jp"

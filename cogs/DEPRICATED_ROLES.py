@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord import app_commands
 from cogs import extensions
 import utils.roledropdowns as rdd
@@ -9,30 +9,14 @@ from db.persistent_db import ViewType, fetch_view, insert_view, delete_view, fet
 import re
 
 
-# CREATE CUSTOM ID USING GUILD ID
-# MAKE COMMANDS WORK FOR MANY SERVERS
-# TRYING TO USE THE COMMAND WHEN A VIEW OF THAT COMMAND IS ALREADY PRESENT SHOULD DELETE THAT ORIGINAL VIEW MESSAGE
-# TAKE IT OUT OF THE SQLITE AND STORE THE GUILD_ID AND THE MESSAGE EMBED_ID TO JUMP TO THEN ACCESS THE VIEW OR INSTA DELETE THYE VIEW)
-        # self.persistent_messages = {
-        #     'jp': {},  # guild_id: message_id, ...
-        #     'na': {},  # guild_id: message_id, ...
-        #     'ranks': {}  # guild_id: message_id, ...
-        # }
-#CREATE THE VIEW IN THE CHANNEL WHERE THE COMMAND WAS USED
-# CREATE AUTO DELETE LISTENER EVENT TO CHECK IF THE MESSAGE ID IS IN THE DICT IF IT IS THEN REMOVE IT FROM THE DICT ANID SQLITE
-# CREATE A COMMAND THAT GIVES MESSAGE LINKS TO ALL VIEWS FOR THE CURRENT SERVER
-# CHANGE THE REGION ATTRIBUTE TO IDENTIFIER AND USE IT IN THE CUSTOM custom_id=f"rs_{identifier}_{guild_id}"
-# STORE EACH VIEW IN SQLITE. 1 TABLE FOR EACH TYPE OF VIEW SUCH AS NA JP RANKED PINGS. Store guild id and message id for that view
-# Read through database when bot starts and check each message id in its corresponding guild to see if it exists.
-#If the view doesnt exist then the view got deleted and you can drop that row for that view
-# Add the views guild id and message id to db if a view command gets ran
-# USE AIOSQLITE FOR ASYNC SQLITE
-
 class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     async def cog_load(self):
+        self.bot.loop.create_task(self.restore_views())
+
+    async def restore_views(self):
         # USE CHANNEL ID AND GUILD ID INSTEAD OF ITERATING THROUGH CHANNELS AND GUILDS TO CHECK IF A VIEW WAS DELETED WHEN THE BOT WAS OFFLINE.
         await self.bot.wait_until_ready()
         getlog().info("Loading persisted views from database...")
@@ -150,66 +134,66 @@ class Roles(commands.Cog):
     def filter_rank_roles(self, iterable):
         return [role for role in iterable if 'rank' in role.name.lower()]
 
-    @app_commands.command(name="jp-roles", description="Get a dropdown to assign/remove roles")
-    async def role_dropdown_jp(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
-        if interaction.user.id not in self.bot.whitelist:
-            return
+    # @app_commands.command(name="jp-roles", description="Get a dropdown to assign/remove roles")
+    # async def role_dropdown_jp(self, interaction: discord.Interaction):
+    #     await interaction.response.defer(ephemeral=True)
+    #     if interaction.user.id not in self.bot.whitelist:
+    #         return
 
-        if not interaction.guild.me.guild_permissions.manage_roles or not interaction.guild.me.guild_permissions.administrator:
-            await interaction.followup.send(
-                embed=BotErrorEmbed(description="❌ I don't have the `Manage Roles` permission!"),
-                ephemeral=True
-            )
-            return
+    #     if not interaction.guild.me.guild_permissions.manage_roles or not interaction.guild.me.guild_permissions.administrator:
+    #         await interaction.followup.send(
+    #             embed=BotErrorEmbed(description="❌ I don't have the `Manage Roles` permission!"),
+    #             ephemeral=True
+    #         )
+    #         return
 
-        # Delete old view if it exists
-        old_view_data = await fetch_view(ViewType.JP, interaction.guild.id)
-        if old_view_data:
-            old_message_id = old_view_data[2]
-            try:
-                old_msg = await interaction.channel.fetch_message(old_message_id)
-                await old_msg.delete()
-            except discord.NotFound:
-                pass
+    #     # Delete old view if it exists
+    #     old_view_data = await fetch_view(ViewType.JP, interaction.guild.id)
+    #     if old_view_data:
+    #         old_message_id = old_view_data[2]
+    #         try:
+    #             old_msg = await interaction.channel.fetch_message(old_message_id)
+    #             await old_msg.delete()
+    #         except discord.NotFound:
+    #             pass
 
-        # Prepare new view
-        na_xp_roles = self.filter_xp_roles(
-            key='jp',
-            iterable=interaction.guild.roles,
-            xp_min=2000,
-            xp_max=2900
-        )
+    #     # Prepare new view
+    #     na_xp_roles = self.filter_xp_roles(
+    #         key='jp',
+    #         iterable=interaction.guild.roles,
+    #         xp_min=2000,
+    #         xp_max=2900
+    #     )
 
-        title_embed = BotMessageEmbed(
-            title="Japan XP Roles",
-            description="Select Your Takoroka Division Power"
-        )
+    #     title_embed = BotMessageEmbed(
+    #         title="Japan XP Roles",
+    #         description="Select Your Takoroka Division Power"
+    #     )
 
-        post = await interaction.channel.send(embed=title_embed)
-        print(post.id)
+    #     post = await interaction.channel.send(embed=title_embed)
+    #     print(post.id)
 
-        view = rdd.RoleViewPowers(
-            region_key='jp',
-            guild_id=interaction.guild.id,
-            msg_id=post.id,
-            bot=self.bot
-        )
-        view.update_roles(na_xp_roles)
+    #     view = rdd.RoleViewPowers(
+    #         region_key='jp',
+    #         guild_id=interaction.guild.id,
+    #         msg_id=post.id,
+    #         bot=self.bot
+    #     )
+    #     view.update_roles(na_xp_roles)
 
-        # Update drodown with view
-        await post.edit(embed=title_embed, view=view)
+    #     # Update drodown with view
+    #     await post.edit(embed=title_embed, view=view)
 
-        # Store in DB
-        await insert_view(
-            ViewType.JP,
-            interaction.guild.id,
-            interaction.channel.id,
-            post.id,
-            self.bot
-        )
+    #     # Store in DB
+    #     await insert_view(
+    #         ViewType.JP,
+    #         interaction.guild.id,
+    #         interaction.channel.id,
+    #         post.id,
+    #         self.bot
+    #     )
 
-        await interaction.followup.send(embed=BotConfirmationEmbed(description='✅ Sent New Dropdown!'))
+    #     await interaction.followup.send(embed=BotConfirmationEmbed(description='✅ Sent New Dropdown!'))
 
     @app_commands.command(name="na-roles", description="Get a dropdown to assign/remove roles")
     async def role_dropdown_na(self, interaction: discord.Interaction):

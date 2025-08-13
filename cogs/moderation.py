@@ -26,7 +26,7 @@ class Moderation(commands.Cog):
 
     @app_commands.command(name='post', description='Create an embed post!')
     @app_commands.describe(message='Please input your message', channel_id='channel to send the message')
-    async def create_post(self, interaction: discord.Interaction, message: str, channel_id: str):
+    async def create_post(self, interaction: discord.Interaction, ping: str, message: str, channel_id: str):
         if interaction.user.id not in self.bot.whitelist:
             return
         else:
@@ -37,7 +37,7 @@ class Moderation(commands.Cog):
                     name=interaction.user.name,
                     icon_url=interaction.user.avatar.url
                 )
-                await dest.send(embed=built_embed)
+                await dest.send(content=ping, embed=built_embed)
                 await interaction.response.send_message(embed=BotConfirmationEmbed(description='Sent!'), ephemeral=True)
             except Exception as e:
                 getlog().error(f'{e}')
