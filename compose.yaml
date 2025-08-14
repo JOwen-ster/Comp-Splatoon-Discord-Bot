@@ -1,10 +1,10 @@
 services:
   splatoon_comp_bot:
     container_name: 'Competitive-Splatoon-Discord-Bot'
-    #image: USERNAME/REPO_NAME:production
-    image: owenster/comp_splatoon_bot:production
     build: .
+    # Or use the image if already built...
+    # image: USERNAME/REPO_NAME:production
     env_file: .env
     restart: unless-stopped
-volumes:
-  - ./views.db:/app/views.db
+    volumes:
+      - ./views.db:/usr/src/bot/views.db
